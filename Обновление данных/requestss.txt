@@ -1,0 +1,83 @@
+﻿--  Количество найденных записей при предварительном поиске совпадает с количеством обновленных строк, эти значения я указал в лимите в запросах на обновление записей.
+
+-- 1 Найдите клиентов Gary Harrison, Michael Atwood, Amy Majors, Katherine Smith и обновите дату их рождения до 21.10.1930, 12.04.1934, -- 1.08.1975, 22.09.1959 соответственно
+
+select * 
+from clients
+where (name = 'Gary' and lastname = 'Harrison') OR (name = 'Michael' and lastname = 'Atwood') OR 
+(name = 'Amy' and lastname = 'Majors') OR (name = 'Katherine' and lastname = 'Smith');
+
+UPDATE clients SET dbirth = '1930-10-21' WHERE id = '782' LIMIT 1;
+UPDATE clients SET dbirth = '1924-04-12' WHERE id = '297' LIMIT 1;
+UPDATE clients SET dbirth = '1975-08-01' WHERE id = '240' LIMIT 1;
+UPDATE clients SET dbirth = '1959-09-22' WHERE id = '306' LIMIT 1;
+
+-- 2 Найдите клиентов с годом рождения ранее 1933 года и удалите номер телефона.
+
+select * 
+from clients
+where dbirth < '1933-01-01';
+
+UPDATE clients SET phone = DEFAULT where dbirth < '1933-01-01' LIMIT 13;
+
+-- 3 Исправьте ошибку клиента John Ohara, его настоящее имя Johanna Ohara, не забудьте поправить и пол клиента.
+
+select * 
+from clients
+where (name = 'John' and lastname = 'Ohara');
+
+UPDATE clients SET name = 'Johanna', lastname = 'Ohara', gender = 'F' WHERE id = '570' LIMIT 1;
+
+-- 4 Замените номера телефонов Humberto Hoosier, Irene Schreiber, Donna Wallace на произвольные значения (для каждого свои).
+
+select * 
+from clients
+where (name = 'Humberto' and lastname = 'Hoosier') OR (name = 'Irene' and lastname = 'Schreiber') OR (name = 'Donna' and lastname = 'Wallace');
+
+UPDATE clients SET phone = '7987765' WHERE id = '673' LIMIT 1;
+UPDATE clients SET phone = '5476543' WHERE id = '447' LIMIT 1;
+UPDATE clients SET phone = '7888888' WHERE id = '293' LIMIT 1;
+
+-- 5 Удалите клиентов с ID 215, 340, 449, 470, 607.
+
+select * 
+from clients
+where id = '215' OR id = '340' OR id = '449' OR id = '470' OR id = '607';
+
+DELETE from clients where id in ('215', '340', '449', '470', '607') LIMIT 4;
+
+-- 6 Удалите клиентов мужского пола с датой рождения в период с 01.01.1941 по 30.04.1941 и с 10.09.1972 по 15.09.1972
+
+select * 
+from clients
+where ((dbirth > '1941-01-01' AND dbirth < '1941-04-30') OR (dbirth > '1972-09-10' AND dbirth < '1972-09-15')) AND gender = 'M';
+
+DELETE from clients where ((dbirth > '1941-01-01' AND dbirth < '1941-04-30') OR (dbirth > '1972-09-10' AND dbirth < '1972-09-15')) AND gender = 'M' LIMIT 2;
+
+
+-- Произведите обновление данных в своей таблице из предыдущего задания. Не менее 5 запросов.
+
+-- 1 Обновление имени автора
+select * from my_collection where name = 'The Catcher in the Rye';
+
+UPDATE my_collection SET Author = 'Jerome David Salinger' WHERE id = '1' LIMIT 1;
+
+-- 2 Повышение рейтинга на книгах с жанром 'novel'
+select * from my_collection where genre = 'novel';
+
+UPDATE my_collection SET My_rate = (My_rate + 0.3) WHERE id IN ('1', '2', '3') LIMIT 3;
+
+-- 3 Сброс рейтинга на книге с годом написания 1951 и жанр которой роман
+select * from my_collection where year ='1951' AND genre = 'novel';
+
+UPDATE my_collection SET My_rate = DEFAULT WHERE id = '1' LIMIT 1;
+
+-- 4 С рейтингом от 8.0 и жанром 'novel', будет обновлён жанр на 'good novel'
+select * from my_collection where genre = 'novel' AND My_rate > 8.0;
+ 
+UPDATE my_collection SET genre = 'good novel' WHERE id IN ('2', '3') LIMIT 2;
+
+-- 5 Удаляем записи без рейтинга
+select * from my_collection where My_rate = NULL;
+
+DELETE FROM my_collection WHERE id = '1' LIMIT 1;

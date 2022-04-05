@@ -1,0 +1,23 @@
+﻿-- Сделайте выборку id и имен клиентов, приведенных: 
+select id, LOWER(Name) AS name from clients limit 10;	-- а) к верхнему регистру, 
+select id, UPPER(Name) AS name from clients limit 10;	-- б) к нижнему регистру.
+
+-- Выведите по каждому клиенту фамилию и имя в одном столбце, а в другом номер телефона в сокращенном виде: первые три и последнюю одну цифру в открытом виде, остальные символы закрыть знаком x, * или # (например, должно получиться так: 977***4). Первому столбцу дайте имя full_name, второму phone_number.
+select CONCAT_WS(' ', name, lastname) as full_name, CONCAT_WS('***', SUBSTRING(phone, 1, 3), SUBSTRING(phone, -1, 1)) as phone_number from clients limit 10;
+
+-- Выведите по каждому клиенту, в фамилии которого есть такие вхождения строк tt, ss, ll, имя и фамилию приведите к формату, где имя будет сокращено до 1 символа с точкой (например: J. Wiliams).
+select CONCAT_WS('. ', SUBSTRING(Name, 1, 1), lastname) as Initials from clients
+ where (POSITION('tt' IN lastname)
+ OR POSITION('ss' IN lastname) OR POSITION('ll' IN lastname)) limit 10;
+
+-- Найдите все записи, в которых телефонные номера:
+select * from clients where LEFT(phone, 3) = 586 limit 4; -- а) начинаются на 586,
+select * from clients where SUBSTRING(phone, 1, 3) = 586 limit 4; -- а) начинаются на 586,
+select * from clients where POSITION(586 IN phone) = 1 limit 4; -- а) начинаются на 586,
+select * from clients where phone LIKE '586%' limit 4; -- а) начинаются на 586,
+
+select * from clients where POSITION(657 IN phone) limit 3; -- б) содержат 657, 
+select * from clients where phone LIKE '%657%' limit 3; -- б) содержат 657, 
+
+select * from clients where RIGHT(phone, 3) = 707 limit 1; -- в) заканчиваются на 707.
+select * from clients where phone LIKE '%707' limit 1; -- в) заканчиваются на 707.
