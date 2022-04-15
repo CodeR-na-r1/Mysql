@@ -1,0 +1,15 @@
+﻿-- Из таблицы clients сделайте по каждому клиенту выборку года рождения;
+select id, name, lastname, year(dbirth) as year	 from clients limit 10;
+
+-- Вычислите по каждому клиенту его текущий возраст относительно сегодняшней даты: 
+select id, name, lastname, timestampdiff(YEAR, dbirth, now()) as age, dbirth from clients limit 10; -- а) полных лет, 
+select id, name, lastname, year(now()) - year(dbirth) as age, dbirth from clients limit 10; -- б) лет до конца текущего года
+
+-- Подсчитайте сколько было/будет полных лет каждому клиенту на: 
+select id, name, lastname, timestampdiff(YEAR, dbirth, '1992-12-08') as age, dbirth from clients where timestampdiff(YEAR, dbirth, '1992-12-08') > 0 limit 10;  -- а) 8 декабря 1992 года, 
+select id, name, lastname, timestampdiff(YEAR, dbirth, '2024-07-15') as age, dbirth from clients where timestampdiff(YEAR, dbirth, '2024-07-15') > 0 limit 10;  -- б) 15 июля 2024 года;
+
+-- Найдите клиентов, у которых планируется день рождения: 
+select id, name, lastname, dbirth from clients where date_format(dbirth, '%m-%d') between date_format(now(), '%m-%d') and date_format(now() + interval 1 week, '%m-%d') limit 10; -- а) в ближайшую неделю, 
+select id, name, lastname, dbirth from clients where date_format(dbirth, '%m-%d') between date_format(now(), '%m-%d') and date_format(now() + interval 2 week, '%m-%d') limit 20; -- б) в ближайшие две недели, 
+select id, name, lastname, dbirth from clients where date_format(dbirth, '%m-%d') between date_format(now(), '%m-%d') and date_format(last_day(now()), '%m-%d') limit 10; -- в) до конца текущего месяца;
