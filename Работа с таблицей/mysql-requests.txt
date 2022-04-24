@@ -1,0 +1,33 @@
+﻿-- cd C:\Program Files\MySQL\MySQL Workbench 8.0
+-- mysql -h 127.0.0.1 -ur1 -pxxxx
+   
+
+1. Для поиска по каждому из имен:
+select * from clients where name = "Robert";	-- а) Robert,
+select * from clients where name = "Jeffrey";	-- в) Jeffrey,
+select * from clients where name = "John";	-- в) John,
+select * from clients where name = "Richard";	-- г) Richard,
+select * from clients where name = "David";	-- д) David,
+select * from clients where name in("Robert", "Jeffrey", "John", "Richard", "David");	-- е) по всем этим значениям в одном запросе
+
+2. Для выборки всех:
+select * from clients where gender = "F";	-- а) женщин,
+select * from clients where gender = "M";	-- б) мужчин
+
+3. Для определения имени и телефона среди всех клиентов с фамилией:
+select name, phone from clients where lastname = "Williams";	-- а) Williams,
+select name, phone from clients where lastname = "Jones";	-- б) Jones,
+select name, phone from clients where lastname = "Brown";	-- в) Brown,
+select name, phone from clients where lastname = "Miller";	-- г) Miller,
+select name, phone from clients where lastname in("Williams", "Jones", "Brown", "Miller");	-- д) по всем этим значениям в одном запросе
+
+4. Для определения даты рождения и пола пользователей с именем или фамилией (то есть нужно найти всех пользователей, у которых либо имя, либо фамилия соответствуют заданным):
+select name, lastname, dbirth, gender from clients where name = "Kelly" OR lastname = "Kelly";	-- а) Kelly,
+select name, lastname, dbirth, gender from clients where name = "Thomas" OR lastname = "Thomas";	-- б) Thomas,
+select name, lastname, dbirth, gender from clients where name = "Clark" OR lastname = "Clark";	-- в) Clark,
+select name, lastname, dbirth, gender from clients where name = "Joseph" OR lastname = "Joseph";	-- в) Joseph,
+
+5. Для определения пола, даты рождения и номера телефона пользователей с именем и фамилией:
+select gender, dbirth, phone from clients where name = "Tom" AND lastname = "Brown";	-- а) Tom Brown,
+select gender, dbirth, phone from clients where name = "Janet" AND lastname = "Silberstein";	-- б) Janet Silberstein,
+select gender, dbirth, phone from clients where name = "John" AND lastname = "Foster";	-- в) John Foster
