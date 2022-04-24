@@ -1,0 +1,46 @@
+﻿-- Упражнение 2
+
+-- 1 Импортируйте дамп БД stats.sql, в нем некая таблица со статистикой;
+mysql -u r1 -p stats < stats.sql
+
+-- 2 Сделайте подсчет суммы хитов и загрузок:
+-- а) по каждому дню
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, SUM(hits) as total_hits, SUM(loads) as total_loads from stats group by date_format(date, "%d");
+-- б) по каждой стране
+select country, SUM(hits) as total_hits, SUM(loads) as total_loads from stats group by country;
+-- в) по каждому дню по каждой стране
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, country, SUM(hits) as total_hits, SUM(loads) as total_loads 
+from stats 
+group by day, country
+order by day;
+
+-- 3 Вычислите среднее значение хитов:
+-- а) по дням
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, AVG(hits) as avg_hits from stats group by day;
+-- б) по странам
+select country, AVG(hits) as avg_hits from stats group by country;
+
+-- 4 Вычислите среднее значение загрузок:
+-- а) по дням
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, AVG(loads) as avg_loads from stats group by day;
+-- б) по странам
+select country, AVG(loads) as avg_loads from stats group by country;
+
+-- 5 Определите максимальное и минимальное значение загрузок:
+-- а) по дням (максимальное)
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, MAX(loads) as max_loads from stats group by day;
+-- а) по дням (минимальное)
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, MIN(loads) as min_loads from stats group by day;
+-- б) по странам (максимальное)
+select country, MAX(loads) as max_loads from stats group by country;
+-- б) по странам (минимальное)
+select country, MIN(loads) as min_loads from stats group by country;
+
+-- 6 Вычислите по каждому дню конверсию (отношение загрузок к хитам);
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, SUM(loads) / SUM(hits) as Conversion from stats group by day order by day ASC;
+
+-- 7 Найдите день с максимальной конверсией;
+select CONCAT_WS(', ', date_format(date, "%M"), date_format(date, "%d")) as day, SUM(loads) / SUM(hits) as Conversion from stats group by day order by Conversion DESC limit 1;
+
+-- 8 Найдите топ-5 стран с максимальной конверсией;
+select country, SUM(loads) / SUM(hits) as Conversion from stats group by country order by Conversion DESC limit 5;
