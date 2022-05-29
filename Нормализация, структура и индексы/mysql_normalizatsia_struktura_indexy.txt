@@ -1,0 +1,102 @@
+-- 1. Выберите индивидуальную задачу.
+
+-- Задача 15.
+-- Продукт (КодПродукта, НазвПродукта, КодБлюда, КолДанногоПродуктаВБлюде)
+-- Блюдо готовится из нескольких продуктов, продукт может использоваться в неск. блюдах
+
+-- 2. Создайте исходную таблицу на языке SQL.
+
+Create database `name_is_not_created`;
+
+use `name_is_not_created`;
+
+-- show tables;
+-- select * from  dishes;
+
+Create table `Products`(
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(100) NOT NULL,
+	`dish_id` INT(10) UNSIGNED NOT NULL,
+	`quantity` INT(7) UNSIGNED NOT NULL,
+
+	PRIMARY KEY (`id`)
+);
+
+-- 3. Заполните таблицу данными, используя INSERT INTO.
+
+INSERT INTO `Products` (`name`, `dish_id`, `quantity`) VALUES
+('Milk', '1', 500),
+('Salt', '1', 5),
+('Sugar', '1', 40),
+('Flour', '1', 300),
+('Raspberry', '2', 200),
+('Salt', '2', 28),
+('Sugar', '2', 250),
+('Cucumbers', '3', 700),
+('Black pepper', '3', 25);
+
+-- 4. Произведите приведение исходной таблицы в нормальную форму путем
+-- создания новых таблиц (CREATE TABLE) и/или
+-- изменения исходной таблицы (ALTER TABLE).
+-- По возможности, страрайтесь сохранить данные в начальной ненормализованной таблице.
+
+-- Выносим информацию о блюдах в отдельную таблицу
+
+Create table `Dishes`(
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(100) NOT NULL,
+
+	PRIMARY KEY (`id`)
+);
+
+-- Заполняем таблицу с блюдами
+
+INSERT INTO `Dishes` (`name`) VALUES
+('Pancakes'),
+('Jam'),
+('Pickled cucumbers');
+
+-- Создаём новую таблицу с продуктами
+
+CREATE TABLE `Products_new`(	
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(100) NOT NULL,
+
+	PRIMARY KEY (`id`)
+);
+
+-- Заполняем новую таблицу с продуктами данными только о продуктах, взятыми со старой таблицы
+
+INSERT INTO `Products_new` (`name`) SELECT DISTINCT name AS `name` FROM `Products`;
+
+-- Выносим информацию о рецептах в отдельную таблицу
+
+Create table `Recipes`(
+	`product_id` INT(10) UNSIGNED NOT NULL,
+	`dish_id` INT(10) UNSIGNED NOT NULL,
+	`quantity` INT(7) UNSIGNED NOT NULL,
+
+	FOREIGN KEY (product_id) REFERENCES Products_new(id) ON DELETE CASCADE,
+	FOREIGN KEY (dish_id) REFERENCES Dishes(id) ON DELETE CASCADE
+);
+
+-- Заполняем таблицу с рецептами
+
+INSERT INTO `Recipes` (`product_id`, `dish_id`, `quantity`) (
+SELECT p_new.`id` AS `product_id`, p.`dish_id` AS `dish_id`, p.`quantity` AS `quantity` FROM `Products` as p
+JOIN `Products_new` as p_new ON p.name = p_new.name
+);
+
+-- Удаляем ненужную старую таблицу и переименовываем новую
+
+DROP TABLE `Products`;
+
+RENAME TABLE Products_new TO Products;
+
+-- Выввод получившийся базы данных
+show tables;
+SELECT * FROM dishes;
+SELECT * FROM products;
+SELECT * FROM recipes;
+
+-- drop database `name_is_not_created`;
