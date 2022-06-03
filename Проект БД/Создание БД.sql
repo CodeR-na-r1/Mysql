@@ -113,9 +113,9 @@ INSERT INTO `Organizers` (`name`, `email`, `phone`, `main_address`) VALUES
 CREATE TABLE IF NOT EXISTS `Exhibitions` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(30) NOT NULL,
-  `date` DATE NOT NULL,
-  `address` VARCHAR(30) NOT NULL,
-  `organizer_id` INT(10) UNSIGNED NOT NULL,
+  `date` DATE,
+  `address` VARCHAR(30),
+  `organizer_id` INT(10) UNSIGNED,
 
   PRIMARY KEY(`id`),
 
@@ -123,6 +123,7 @@ CREATE TABLE IF NOT EXISTS `Exhibitions` (
 );
 
 INSERT INTO `Exhibitions` (`name`, `date`, `address`, `organizer_id`) VALUES
+('нет', NULL, NULL, NULL),
 ('Музей оружия', '4.06.2022', 'Марианская, 11', 1),
 ('Музей Ruby', '24.06.2022', 'Ленина, 223', 2),
 ('Несуществующий музей Фокус', '5.06.2022', 'Илюзоная, 37', 1),
@@ -149,14 +150,14 @@ CREATE TABLE IF NOT EXISTS `Items` (
 );
 
 INSERT INTO `Items` (`name`, `release_year`, `creator_id`, `type_id`, `status_id`, `storage_id`, `exhibition_id`, `initial_price`) VALUES
-('Yamaha r1', 1998, 6, 20, 1, 1, 2, 1980000),
-('Клавиатура Бога', 2002, 3, 23, 3, 5, NULL, 48000),
-('Крест', 1253, 4, 2, 6, 4, 4, 1987500),
-('ИС-4', 1944, 10, 19, 1, 2, 1, 299250000),
-('Герника', 1937, 8, 3, 2, 1, 3, 5950000),
-('Лаврентьевская летопись', 1377, 9, 16, 4, 1, 4, 925000000),
-('Сон, вызванный полётом пчелы вокруг граната, за секунду до пробуждения', 2008, 11, 3, 5, 5, 2, 3980000),
-('Война и мир', 1958, 5, 6, 3, 3, NULL, 98000);
+('Yamaha r1', 1998, 6, 20, 1, 1, 3, 1980000),
+('Клавиатура Бога', 2002, 3, 23, 3, 5, 1, 48000),
+('Крест', 1253, 4, 2, 6, 4, 5, 1987500),
+('ИС-4', 1944, 10, 19, 1, 2, 2, 299250000),
+('Герника', 1937, 8, 3, 2, 1, 4, 5950000),
+('Лаврентьевская летопись', 1377, 9, 16, 4, 1, 5, 925000000),
+('Сон, вызванный полётом пчелы вокруг граната, за секунду до пробуждения', 2008, 11, 3, 5, 5, 3, 3980000),
+('Война и мир', 1958, 5, 6, 3, 3, 1, 98000);
 
 CREATE  TABLE IF NOT EXISTS `Positions` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -214,12 +215,13 @@ INSERT INTO `Employees` (`name`, `surname`, `Patronymic`, `position_id`, `salary
 DROP VIEW IF EXISTS total_info;
 CREATE VIEW total_info
 AS
-SELECT i.id, i.name, i.release_year, CONCAT_WS(' ', cr.name, cr.initials) AS creator, t.name AS type, status.name AS status, storage.name AS storage, i.initial_price
+SELECT i.id, i.name, i.release_year, CONCAT_WS(' ', cr.name, cr.initials) AS creator, t.name AS type, status.name AS status, storage.name AS storage, exhibition.name AS exhibition, i.initial_price
 FROM `Items` AS i
-JOIN `creators` AS cr ON i.id = cr.id
-JOIN `types` AS t ON i.id = t.id
-JOIN `statuses` AS status ON i.id = status.id
-JOIN `storages` AS storage ON i.id = storage.id;
+JOIN `creators` AS cr ON i.creator_id = cr.id
+JOIN `types` AS t ON i.type_id = t.id
+JOIN `statuses` AS status ON i.status_id = status.id
+JOIN `storages` AS storage ON i.storage_id = storage.id
+JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id;
 
 --  Информация о персонале
 DROP VIEW IF EXISTS employees_info;
