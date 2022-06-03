@@ -227,7 +227,7 @@ JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id;
 DROP VIEW IF EXISTS view_employees_info;
 CREATE VIEW view_employees_info
 AS
-SELECT CONCAT_WS(' ', e.name, e.`surname`, e.`patronymic`) AS full_name, p.name AS position, e.salary AS salary, e.dbirth AS dbirth
+SELECT e.id as id, CONCAT_WS(' ', e.name, e.`surname`, e.`patronymic`) AS full_name, p.name AS position, e.salary AS salary, e.dbirth AS dbirth
 FROM `Employees` AS e
 JOIN `Positions` AS p ON e.position_id = p.id;
 
