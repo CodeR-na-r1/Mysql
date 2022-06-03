@@ -1,4 +1,4 @@
--- mysql -ur1 -hlocalhost -p
+-- Файл с командами для создания БД, таблиц, представлений.
 
 drop database IF EXISTS `auction_of_items`;
 
@@ -124,10 +124,10 @@ CREATE TABLE IF NOT EXISTS `Exhibitions` (
 
 INSERT INTO `Exhibitions` (`name`, `date`, `address`, `organizer_id`) VALUES
 ('нет', NULL, NULL, NULL),
-('Музей оружия', '4.06.2022', 'Марианская, 11', 1),
-('Музей Ruby', '24.06.2022', 'Ленина, 223', 2),
-('Несуществующий музей Фокус', '5.06.2022', 'Илюзоная, 37', 1),
-('Музей странного исскуства', '1.04.2023', 'Реальная, 44', 3);
+('Музей оружия', '2022-06-04', 'Марианская, 11', 1),
+('Музей Ruby', '2022-06-24', 'Ленина, 223', 2),
+('Несуществующий музей Фокус', '2022-06-05', 'Илюзоная, 37', 1),
+('Музей странного исскуства', '2023-04-01', 'Реальная, 44', 3);
 
 CREATE TABLE IF NOT EXISTS `Items` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -212,8 +212,8 @@ INSERT INTO `Employees` (`name`, `surname`, `Patronymic`, `position_id`, `salary
 -- Создание представлений ---
 
 -- Информация о товаре
-DROP VIEW IF EXISTS total_info;
-CREATE VIEW total_info
+DROP VIEW IF EXISTS view_total_info;
+CREATE VIEW view_total_info
 AS
 SELECT i.id, i.name, i.release_year, CONCAT_WS(' ', cr.name, cr.initials) AS creator, t.name AS type, status.name AS status, storage.name AS storage, exhibition.name AS exhibition, i.initial_price
 FROM `Items` AS i
@@ -224,11 +224,41 @@ JOIN `storages` AS storage ON i.storage_id = storage.id
 JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id;
 
 --  Информация о персонале
-DROP VIEW IF EXISTS employees_info;
-CREATE VIEW employees_info
+DROP VIEW IF EXISTS view_employees_info;
+CREATE VIEW view_employees_info
 AS
 SELECT CONCAT_WS(' ', e.name, e.`surname`, e.`patronymic`) AS full_name, p.name AS position, e.salary AS salary, e.dbirth AS dbirth
 FROM `Employees` AS e
 JOIN `Positions` AS p ON e.position_id = p.id;
 
--- 
+--  Информация о выставках
+DROP VIEW IF EXISTS view_exhibitions_info;
+CREATE VIEW view_exhibitions_info
+AS
+SELECT ex.name as name, ex.address AS address, date_format(ex.date, '%d %M %Y') AS date, org.name AS organizer
+FROM `Exhibitions` AS ex
+JOIN `Organizers` AS org ON ex.organizer_id = org.id;
+
+--  Информация о товаре, который будет на выставках
+DROP VIEW IF EXISTS view_items_with_exhibition;
+CREATE VIEW view_items_with_exhibition
+AS
+SELECT i.id, i.name, CONCAT_WS(' ', cr.name, cr.initials) AS creator, t.name AS type, storage.name AS storage, exhibition.name AS exhibition, i.initial_price
+FROM `Items` AS i
+JOIN `creators` AS cr ON i.creator_id = cr.id
+JOIN `types` AS t ON i.type_id = t.id
+JOIN `storages` AS storage ON i.storage_id = storage.id
+JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id
+WHERE i.exhibition_id > 1;
+
+--  Информация о товаре, который не будет на выставках
+DROP VIEW IF EXISTS view_items_without_exhibition;
+CREATE VIEW view_items_without_exhibition
+AS
+SELECT i.id, i.name, CONCAT_WS(' ', cr.name, cr.initials) AS creator, t.name AS type, storage.name AS storage, exhibition.name AS exhibition, i.initial_price
+FROM `Items` AS i
+JOIN `creators` AS cr ON i.creator_id = cr.id
+JOIN `types` AS t ON i.type_id = t.id
+JOIN `storages` AS storage ON i.storage_id = storage.id
+JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id
+WHERE i.exhibition_id = 1;
