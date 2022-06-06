@@ -9,6 +9,15 @@ DELETE FROM `items` AS i WHERE i.id = 2 LIMIT 1;
 -- Изменение цены экспоната по id
 UPDATE `items` AS i SET initial_price = 2495000 WHERE i.id = 1 LIMIT 1;
 
+-- Удаление прошедших выставок у экспонатов
+UPDATE `items` AS i SET exhibition_id = 1
+WHERE i.id IN (
+(SELECT id
+FROM
+(SELECT i.id, e.date FROM `items` AS i JOIN `exhibitions` AS e ON e.id = i.exhibition_id) AS inner_t
+WHERE date < NOW())
+);
+
 -- Удаление сотрудника по id
 DELETE FROM `Employees` AS e WHERE e.id = 1 LIMIT 1;
 

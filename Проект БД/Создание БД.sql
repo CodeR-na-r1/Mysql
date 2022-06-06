@@ -221,7 +221,8 @@ JOIN `creators` AS cr ON i.creator_id = cr.id
 JOIN `types` AS t ON i.type_id = t.id
 JOIN `statuses` AS status ON i.status_id = status.id
 JOIN `storages` AS storage ON i.storage_id = storage.id
-JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id;
+JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id
+ORDER BY i.id;
 
 --  Информация о персонале
 DROP VIEW IF EXISTS view_employees_info;
@@ -262,3 +263,12 @@ JOIN `types` AS t ON i.type_id = t.id
 JOIN `storages` AS storage ON i.storage_id = storage.id
 JOIN `Exhibitions` AS exhibition ON i.exhibition_id = exhibition.id
 WHERE i.exhibition_id = 1;
+
+--  Информация о товарах, у которых выставки уже прошли
+DROP VIEW IF EXISTS view_items_exhibition_completed;
+CREATE VIEW view_items_exhibition_completed
+AS
+SELECT i.id, i.name AS item, e.name AS exhibition, e.date
+FROM items AS i
+JOIN exhibitions AS e ON e.id = i.exhibition_id
+WHERE e.date < NOW();
